@@ -1,6 +1,6 @@
 module github.com/fiberweb/stripe
 
-go 1.13
+go 1.11
 
 require (
 	github.com/gofiber/fiber v1.8.3

@@ -20,9 +20,7 @@ func New(config ...*Config) func(*fiber.Ctx) {
 	var cfg *Config
 
 	if len(config) == 0 {
-		cfg = &Config{
-			SigningSecret: os.Getenv("STRIPE_WEBHOOK_SIGNING_SECRET"),
-		}
+		cfg = &Config{SigningSecret: os.Getenv("STRIPE_WEBHOOK_SIGNING_SECRET")}
 	} else {
 		cfg = config[0]
 	}
@@ -41,7 +39,7 @@ func New(config ...*Config) func(*fiber.Ctx) {
 			return
 		}
 		// put Stripe event to "stripeEvent" locals for next handler
-		c.Locals("stripeEvent", event)
+		c.Locals("StripeEvent", event)
 		c.Next()
 	}
 }
