@@ -43,7 +43,7 @@ You could also specify the Signing Secret on Environment Variable `STRIPE_WEBHOO
 app.Use(webhook.New())
 ```
 
-When you run your app, you need to make sure the `STRIPE_WEBHOOK_SIGNING_SECRET` variable is set:
+Then when you run your app, you need to make sure the `STRIPE_WEBHOOK_SIGNING_SECRET` variable is set:
 
 ```
 $ export STRIPE_WEBHOOK_SIGNING_SECRET=whsec_t4QaeaxpeR
@@ -53,6 +53,8 @@ $ ./MyGoApp
 
 $ STRIPE_WEBHOOK_SIGNING_SECRET=whsec_t4QaeaxpeR ./MyGoApp
 ```
+
+**IMPORTANT: Missing Signing Secret when using this middleware won't break your app, but this middleware will return `Internal Server Error` response if Signing Secret is not set.**
 
 ## Configuration
 
