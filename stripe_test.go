@@ -3,6 +3,7 @@ package stripe
 import (
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -47,12 +48,63 @@ func makeRequest(body io.Reader) (req *http.Request) {
 	return
 }
 
+func Test_Skip(t *testing.T) {
+	req := makeRequest(strings.NewReader(webhookBody))
+
+	app := fiber.New()
+	app.Use(New(&Config{
+		SigningSecret: "whsec_t4QaeaxpeR",
+		Skip: func(c *fiber.Ctx) bool {
+			return true
+		},
+	}))
+	app.Post("/", func(c *fiber.Ctx) {
+		c.Send("ok")
+	})
+	resp, _ := app.Test(req)
+
+	if http.StatusOK != resp.StatusCode {
+		t.Error("Stripe webhook should be skipped")
+	}
+}
+
+func Test_MissingSigningSecret(t *testing.T) {
+	req := makeRequest(strings.NewReader(webhookBody))
+
+	app := fiber.New()
+	app.Use(New())
+	app.Post("/", func(c *fiber.Ctx) {
+		c.Send("ok")
+	})
+	resp, _ := app.Test(req)
+
+	if http.StatusInternalServerError != resp.StatusCode {
+		t.Error("should return 500 error code")
+	}
+}
+
+func Test_SigningSecretEnvVariable(t *testing.T) {
+	req := makeRequest(strings.NewReader(webhookBody))
+	os.Setenv(SigningSecretEnv, "whsec_t4QaeaxpeR")
+
+	app := fiber.New()
+	app.Use(New())
+	app.Post("/", func(c *fiber.Ctx) {
+		c.Send("ok")
+	})
+	resp, _ := app.Test(req)
+
+	if http.StatusBadRequest != resp.StatusCode {
+		t.Error("should not return 500 error code")
+	}
+}
+
 func Test_MissingSignatureInHeader(t *testing.T) {
 	req := makeRequest(strings.NewReader(webhookBody))
 
 	app := fiber.New()
 	app.Use(New(&Config{SigningSecret: "whsec_t4QaeaxpeR"}))
-	app.Get("/", func(c *fiber.Ctx) {
+	app.Post("/", func(c *fiber.Ctx) {
 		c.Send("ok")
 	})
 	resp, _ := app.Test(req)
@@ -68,7 +120,7 @@ func Test_BadSignatureInHeader(t *testing.T) {
 
 	app := fiber.New()
 	app.Use(New(&Config{SigningSecret: "whsec_t4QaeaxpeR"}))
-	app.Get("/", func(c *fiber.Ctx) {
+	app.Post("/", func(c *fiber.Ctx) {
 		c.Send("ok")
 	})
 	resp, _ := app.Test(req)

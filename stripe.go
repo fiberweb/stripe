@@ -1,12 +1,16 @@
 package stripe
 
 import (
-	"log"
 	"net/http"
 	"os"
 
 	"github.com/gofiber/fiber"
 	"github.com/stripe/stripe-go/webhook"
+)
+
+const (
+	// SigningSecretEnv is the variable name for Signing Secret
+	SigningSecretEnv = "STRIPE_WEBHOOK_SIGNING_SECRET"
 )
 
 // Config is used to configure the middleware
@@ -20,17 +24,18 @@ func New(config ...*Config) func(*fiber.Ctx) {
 	var cfg *Config
 
 	if len(config) == 0 {
-		cfg = &Config{SigningSecret: os.Getenv("STRIPE_WEBHOOK_SIGNING_SECRET")}
+		cfg = &Config{SigningSecret: os.Getenv(SigningSecretEnv)}
 	} else {
 		cfg = config[0]
 	}
 
-	if cfg.SigningSecret == "" {
-		log.Fatalln("Stripe webhook: missing Signing Secret")
-	}
 	return func(c *fiber.Ctx) {
 		if cfg.Skip != nil && cfg.Skip(c) {
 			c.Next()
+			return
+		}
+		if cfg.SigningSecret == "" {
+			c.Status(http.StatusInternalServerError).SendString("Stripe webhook: missing Signing Secret")
 			return
 		}
 		event, err := webhook.ConstructEvent([]byte(c.Body()), c.Get("Stripe-Signature"), cfg.SigningSecret)
