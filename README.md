@@ -1,5 +1,5 @@
 # stripe
-This a [Fiber](https://github.com/gofiber/fiber) middleware to validates [Stripe webhooks](https://stripe.com/docs/webhooks) signed request.
+This is a [Fiber](https://github.com/gofiber/fiber) middleware to validates [Stripe webhooks](https://stripe.com/docs/webhooks) signed request.
 
 ## Install
 
@@ -40,7 +40,7 @@ Please note that when the webhook request successfully pass the middleware check
 You could also specify the Signing Secret on Environment Variable `STRIPE_WEBHOOK_SIGNING_SECRET`, so you don't need to specify Signin Secret in the code, example:
 
 ```
-  app.Use(webhook.New())
+app.Use(webhook.New())
 ```
 
 When you run your app, you need to make sure the `STRIPE_WEBHOOK_SIGNING_SECRET` variable is set:
@@ -51,7 +51,7 @@ $ ./MyGoApp
 
 # for one liners:
 
-STRIPE_WEBHOOK_SIGNING_SECRET=whsec_t4QaeaxpeR ./MyGoApp
+$ STRIPE_WEBHOOK_SIGNING_SECRET=whsec_t4QaeaxpeR ./MyGoApp
 ```
 
 ## Configuration
@@ -75,7 +75,7 @@ app.Use(webhook.New(&webhook.Config{
       // add your logic here
       return true // returning true will skip this middleware.
     }
-  }))
+}))
 ```
 
 #### `SigningSecret string`
