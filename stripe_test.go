@@ -52,7 +52,7 @@ func Test_Skip(t *testing.T) {
 	req := makeRequest(strings.NewReader(webhookBody))
 
 	app := fiber.New()
-	app.Use(New(&Config{
+	app.Use(New(Config{
 		SigningSecret: "whsec_t4QaeaxpeR",
 		Skip: func(c *fiber.Ctx) bool {
 			return true
@@ -103,7 +103,7 @@ func Test_MissingSignatureInHeader(t *testing.T) {
 	req := makeRequest(strings.NewReader(webhookBody))
 
 	app := fiber.New()
-	app.Use(New(&Config{SigningSecret: "whsec_t4QaeaxpeR"}))
+	app.Use(New(Config{SigningSecret: "whsec_t4QaeaxpeR"}))
 	app.Post("/", func(c *fiber.Ctx) {
 		c.Send("ok")
 	})
@@ -119,7 +119,7 @@ func Test_BadSignatureInHeader(t *testing.T) {
 	req.Header.Set("Stripe-Signature", invalidSignature)
 
 	app := fiber.New()
-	app.Use(New(&Config{SigningSecret: "whsec_t4QaeaxpeR"}))
+	app.Use(New(Config{SigningSecret: "whsec_t4QaeaxpeR"}))
 	app.Post("/", func(c *fiber.Ctx) {
 		c.Send("ok")
 	})

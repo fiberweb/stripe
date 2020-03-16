@@ -23,7 +23,7 @@ func main() {
   app := fiber.New()
   
   // use the middleware
-  app.Use(webhook.New(&webhook.Config{SigningSecret: "whsec_t4QaeaxpeR"}))
+  app.Use(webhook.New(webhook.Config{SigningSecret: "whsec_t4QaeaxpeR"}))
   
   // webhook handler
   app.Post("/webhook", func(c *fiber.Ctx) {
@@ -71,7 +71,7 @@ type Config struct {
 This is to skip Fiber from using this middleware based on certain condition, example:
 
 ```
-app.Use(webhook.New(&webhook.Config{
+app.Use(webhook.New(webhook.Config{
     SigningSecret: "whsec_t4QaeaxpeR",
     Skip: func(c *fiber.Ctx) bool {
       // add your logic here

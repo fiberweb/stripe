@@ -20,11 +20,11 @@ type Config struct {
 }
 
 // New returns middleware for Stripe webhook
-func New(config ...*Config) func(*fiber.Ctx) {
-	var cfg *Config
+func New(config ...Config) func(*fiber.Ctx) {
+	var cfg Config
 
 	if len(config) == 0 {
-		cfg = &Config{SigningSecret: os.Getenv(SigningSecretEnv)}
+		cfg = Config{SigningSecret: os.Getenv(SigningSecretEnv)}
 	} else {
 		cfg = config[0]
 	}
